@@ -38,7 +38,7 @@ function getInputKey(keyCode: number): InputKey {
   } else if (isLeftPressed(keyCode)) {
     result = InputKey.Left;
   }
-  return result;
+  return result; 
 }
 
 export function getInputStream(): Observable<InputKey> {
