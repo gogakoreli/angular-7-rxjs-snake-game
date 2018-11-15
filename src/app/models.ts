@@ -31,3 +31,9 @@ export interface Tile {
   isFood: boolean;
   isSnake: boolean;
 }
+
+export interface SnakeState {
+  snake: Snake;
+  snakeMap: SnakeMap;
+  food: Food;
+}

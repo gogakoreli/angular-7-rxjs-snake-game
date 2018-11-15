@@ -3,6 +3,7 @@ import {
   Food,
   Snake,
   SnakeMap,
+  SnakeState,
   Tile
   } from './models';
 
@@ -14,7 +15,7 @@ export function defaultSnakeMap(): SnakeMap {
   };
 }
 
-export function drawSnakeAndFood(
+export function updateSnakeMap(
   snakeMap: SnakeMap,
   snake: Snake,
   food: Food,
@@ -35,13 +36,43 @@ export function drawSnakeAndFood(
   };
 }
 
+function emptyTile(snakeMap: SnakeMap, i: number, j: number) {
+  const tile = snakeMap.grid[i][j];
+  return !tile.isFood && !tile.isSnake;
+}
+
 function emptyGrid(): Tile[][] {
+  return initGrid((i, j) => {
+    return { isFood: false, isSnake: false };
+  });
+}
+
+function initGrid(setItem: (i: number, j: number) => Tile): Tile[][] {
   let grid: Tile[][] = [];
   for (let i = 0; i < MAP_WIDTH; i++) {
     grid[i] = [];
     for (let j = 0; j < MAP_HEIGHT; j++) {
-      grid[i][j] = { isFood: false, isSnake: false };
+      grid[i][j] = setItem(i, j);
     }
   }
   return grid;
+}
+
+export function randomFood(state: SnakeState): SnakeState {
+  while (true) {
+    let i = Math.floor(Math.random() * MAP_WIDTH);
+    let j = Math.floor(Math.random() * MAP_HEIGHT);
+
+    if (emptyTile(state.snakeMap, i, j)) {
+      state = {
+        ...state,
+        food: {
+          i,
+          j,
+        },
+      };
+      break;
+    }
+  }
+  return state;
 }
