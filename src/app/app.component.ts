@@ -12,6 +12,9 @@ import {
   takeUntil
   } from 'rxjs/operators';
 import { getInputStream } from './input';
+import { Food, Snake, SnakeMap } from './models';
+import { defaultSnake, moveToDirection } from './snake';
+import { defaultSnakeMap } from './snake-map';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +37,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private initializeSubscription() {
-    getInputStream()
+    const snake = defaultSnake();
+    const snakeMap = defaultSnakeMap();
+
+    const input$ = getInputStream()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(input => {
         console.log(input);
@@ -51,8 +57,14 @@ export class AppComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$),
       )
       .subscribe(x => {
-        console.log(x);
+        this.onTick(snake, snakeMap);
       });
+  }
+
+  private onTick(snake: Snake, snakeMap: SnakeMap) {
+    const food: Food = { j: 5, i: 5 };
+    snake = moveToDirection(snake, food);
+    console.log(snake.parts);
   }
 
   public rangeChange(value: string) {

@@ -22,3 +22,12 @@ export interface Food {
   i: number;
   j: number;
 }
+
+export interface SnakeMap {
+  grid: Tile[][];
+}
+
+export interface Tile {
+  isFood: boolean;
+  isSnake: boolean;
+}
