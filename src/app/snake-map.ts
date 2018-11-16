@@ -21,14 +21,13 @@ export function updateSnakeMap(
   food: Food,
 ): SnakeMap {
   const grid = emptyGrid();
+  grid[food.i][food.j] = { isFood: true, isSnake: false };
   snake.parts.forEach(part => {
     grid[part.i][part.j] = {
       isFood: false,
       isSnake: true,
     };
   });
-
-  grid[food.i][food.j] = { isFood: true, isSnake: false };
 
   return {
     ...snakeMap,
