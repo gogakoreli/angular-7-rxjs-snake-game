@@ -15,6 +15,7 @@ export function defaultSnake(): Snake {
     head,
     length: 1,
     parts: [head],
+    foodEaten: false,
   };
 }
 
@@ -30,11 +31,9 @@ export function updateDirection(snake: Snake, direction: Direction): Snake {
 
 export function moveToDirection(snake: Snake, food: Food): Snake {
   let newParts = snake.parts;
-  if (!hasFoodEaten(snake, food)) {
-    newParts = newParts.filter((_, i) => i > 0);
-  }
   const newHead = getNewHead(snake);
   newParts.push(newHead);
+
   return {
     ...snake,
     head: newHead,
@@ -43,7 +42,27 @@ export function moveToDirection(snake: Snake, food: Food): Snake {
   };
 }
 
-export function hasFoodEaten(snake: Snake, food: Food): boolean {
+export function updateFoodEaten(snake: Snake, food: Food) {
+  const foodEaten = hasFoodEaten(snake, food);
+  let parts = snake.parts;
+  if (!foodEaten) {
+    parts = parts.filter((_, i) => i > 0);
+  }
+
+  return {
+    ...snake,
+    foodEaten,
+    parts,
+    length: parts.length,
+  };
+}
+
+/**
+ * @description shouldn't be used from outside of snake
+ * this is mainly for checking by itself to set property foodEaten
+ * @see snake.foodEaten for using from outside
+ */
+function hasFoodEaten(snake: Snake, food: Food): boolean {
   return snake.head.i === food.i && snake.head.j === food.j;
 }
 

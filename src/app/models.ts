@@ -8,6 +8,7 @@ export interface Snake {
   parts: SnakePart[];
   direction: Direction;
   length: number;
+  foodEaten: boolean;
 }
 
 export enum Direction {
