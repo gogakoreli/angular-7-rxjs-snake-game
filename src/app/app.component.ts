@@ -18,7 +18,7 @@ import {
   defaultSnake,
   moveToDirection,
   updateDirection,
-  hasFoodEaten,
+  updateFoodEaten,
 } from './snake';
 import {
   BehaviorSubject,
@@ -62,7 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const range$ = this.getRangeStream();
 
-    const interval$ = range$
+    range$
       .pipe(
         switchMap(range => interval(100).pipe(filter(x => x % range === 0))),
         takeUntil(this.unsubscribe$),
@@ -71,6 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(([_, direction]: [number, Direction]) => {
         state = { ...state, snake: updateDirection(state.snake, direction) };
         state = { ...state, snake: moveToDirection(state.snake, state.food) };
+        state = { ...state, snake: updateFoodEaten(state.snake, state.food) };
         state = this.updateFoodEaten(state);
 
         state = this.onTick(state);
@@ -78,7 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private updateFoodEaten(state: SnakeState) {
-    if (hasFoodEaten(state.snake, state.food)) {
+    if (state.snake.foodEaten) {
       state = randomFood(state);
     }
     return state;
@@ -90,12 +91,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
     snakeMap = updateSnakeMap(snakeMap, snake, food);
-    const cols = snakeMap.grid
-      .map(x => x.map(y => (y.isFood ? '*' : y.isSnake ? 'x' : '.')).join(' '))
+    const drawGrid = snakeMap.grid
+      .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
       .join('\n');
-    console.log(cols);
+    console.log(drawGrid);
     console.log();
-    console.log(snakeMap);
     return {
       snake,
       snakeMap,
