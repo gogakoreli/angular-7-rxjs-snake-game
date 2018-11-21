@@ -1,9 +1,4 @@
-import {
-  Direction,
-  Food,
-  Snake,
-  SnakePart
-  } from './models';
+import { Direction, Food, Snake, SnakePart } from './models';
 
 export function defaultSnake(): Snake {
   const head = {
@@ -42,7 +37,7 @@ export function moveToDirection(snake: Snake, food: Food): Snake {
   };
 }
 
-export function updateFoodEaten(snake: Snake, food: Food) {
+export function snakeFoodEaten(snake: Snake, food: Food) {
   const foodEaten = hasFoodEaten(snake, food);
   let parts = snake.parts;
   if (!foodEaten) {
