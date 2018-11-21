@@ -1,32 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {
-  BehaviorSubject,
-  interval,
-  Observable,
-  Subject,
-  zip,
-  range,
-  combineLatest,
-} from 'rxjs';
+import { BehaviorSubject, interval, Observable, Subject } from 'rxjs';
 import {
   filter,
   map,
   switchMap,
   takeUntil,
   tap,
-  defaultIfEmpty,
   withLatestFrom,
-  repeat,
-  buffer,
-  bufferCount,
-  last,
-  pairwise,
   take,
-  shareReplay,
-  share,
-  refCount,
-  takeWhile,
-  skipUntil,
   concatMap,
 } from 'rxjs/operators';
 import { getInputStream } from './input';
