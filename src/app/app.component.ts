@@ -36,10 +36,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe$ = new Subject<boolean>();
   private sliderRange$ = new BehaviorSubject<number>(50);
 
+  public snakeState$: Observable<SnakeState>;
+
   constructor() {}
 
   ngOnInit(): void {
-    this.initializeSubscription(this.sliderRange$, this.unsubscribe$);
+    this.snakeState$ = getSnakeStateStream(
+      this.sliderRange$,
+      this.unsubscribe$,
+    );
   }
 
   ngOnDestroy(): void {
@@ -47,49 +52,54 @@ export class AppComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  private initializeSubscription(
-    sliderRange$: Observable<number>,
-    unsubscribe$: Observable<boolean>,
-  ) {
-    let state: SnakeState = {
-      snake: defaultSnake(),
-      food: { j: 5, i: 0 },
-      snakeMap: defaultSnakeMap(),
-    };
+  public sliderRangeChange(value: string) {
+    const sliderRange = Number.parseInt(value);
+    this.sliderRange$.next(sliderRange);
+  }
+}
 
-    const range$ = getRangeStream(sliderRange$);
-    const interval$ = getIntervalStream(range$);
-    const direction$ = getDirectionStream(interval$);
-    const tick$ = getTickStream(interval$, direction$, unsubscribe$);
+export function getSnakeStateStream(
+  sliderRange$: Observable<number>,
+  unsubscribe$: Observable<boolean>,
+) {
+  let state: SnakeState = {
+    snake: defaultSnake(),
+    food: { j: 5, i: 0 },
+    snakeMap: defaultSnakeMap(),
+  };
 
-    tick$.subscribe(([_, direction]) => {
+  const range$ = getRangeStream(sliderRange$);
+  const interval$ = getIntervalStream(range$);
+  const direction$ = getDirectionStream(interval$);
+  const tick$ = getTickStream(interval$, direction$, unsubscribe$);
+
+  const state$ = tick$.pipe(
+    map(([_, direction]) => {
       state = { ...state, snake: updateDirection(state.snake, direction) };
       state = { ...state, snake: moveToDirection(state.snake, state.food) };
       state = { ...state, snake: snakeFoodEaten(state.snake, state.food) };
       state = checkFoodEaten(state);
 
-      state = this.onTick(state);
-    });
-  }
+      state = onTick(state);
+      return state;
+    }),
+  );
 
-  private onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
-    snakeMap = updateSnakeMap(snakeMap, snake, food);
-    const drawGrid = snakeMap.grid
-      .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
-      .join('\n');
-    console.log(drawGrid);
-    console.log();
-    return {
-      snake,
-      snakeMap,
-      food,
-    };
-  }
+  return state$;
+}
 
-  public sliderRangeChange(value: string) {
-    const sliderRange = Number.parseInt(value);
-    this.sliderRange$.next(sliderRange);
-  }
+export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
+  snakeMap = updateSnakeMap(snakeMap, snake, food);
+  const drawGrid = snakeMap.grid
+    .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
+    .join('\n');
+  console.log(drawGrid);
+  console.log();
+  return {
+    snake,
+    snakeMap,
+    food,
+  };
 }
 
 export function getTickStream(

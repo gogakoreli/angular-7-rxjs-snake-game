@@ -1,7 +1,11 @@
-<input type="range"
+<input
+  type="range"
   step="25"
   min="0"
   max="100"
   value="50"
   class="slider"
-  (input)="sliderRangeChange($event?.target?.value)">
+  (input)="sliderRangeChange($event?.target?.value)"
+/>
+
+<app-snake-state [state]="snakeState$ | async"></app-snake-state>
