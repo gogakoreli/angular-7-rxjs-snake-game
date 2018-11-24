@@ -4,6 +4,6 @@
     *ngFor="let tile of row"
     [ngStyle]="{ 'grid-row': rowIndex + 1 }"
   >
-    <div class="tile" [ngClass]="getTileClass(tile)"></div>
+    <div class="tile" [ngClass]="getTileClass(tile, state)"></div>
   </div>
 </ng-container>

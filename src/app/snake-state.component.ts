@@ -18,7 +18,7 @@ export class SnakeStateComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  public getTileClass(tile: Tile) {
+  public getTileClass(tile: Tile, state: SnakeState) {
     let res: {} = tile.isFood && {
       food: true,
     };
@@ -26,6 +26,12 @@ export class SnakeStateComponent implements OnInit {
       (tile.isSnake && {
         snake: true,
       }) ||
+      res;
+    res =
+      (tile.isSnake &&
+        tile.isSnakeHead && {
+          'snake-head': true,
+        }) ||
       res;
     return res;
   }
