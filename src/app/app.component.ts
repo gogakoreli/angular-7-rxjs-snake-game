@@ -16,6 +16,7 @@ import {
   concatMap,
   share,
   observeOn,
+  distinctUntilChanged,
 } from 'rxjs/operators';
 import { getInputStream } from './input';
 import { Direction, SnakeState } from './models';
@@ -128,6 +129,7 @@ export function getDirectionStream(interval$: Observable<number>) {
 
   const direction$ = input$.pipe(
     map(key => Direction[Direction[key]] as Direction),
+    distinctUntilChanged(),
     filter(dir => dir !== Direction.None),
 
     concatMap(input =>
