@@ -1,14 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, interval, Observable, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  interval,
+  Observable,
+  Subject,
+  animationFrameScheduler,
+} from 'rxjs';
 import {
   filter,
   map,
   switchMap,
   takeUntil,
-  tap,
   withLatestFrom,
   take,
   concatMap,
+  share,
+  observeOn,
 } from 'rxjs/operators';
 import { getInputStream } from './input';
 import { Direction, SnakeState } from './models';
@@ -56,7 +63,6 @@ export class AppComponent implements OnInit, OnDestroy {
     const tick$ = getTickStream(interval$, direction$, unsubscribe$);
 
     tick$.subscribe(([_, direction]) => {
-      console.log(_, direction);
       state = { ...state, snake: updateDirection(state.snake, direction) };
       state = { ...state, snake: moveToDirection(state.snake, state.food) };
       state = { ...state, snake: snakeFoodEaten(state.snake, state.food) };
@@ -71,8 +77,8 @@ export class AppComponent implements OnInit, OnDestroy {
     const drawGrid = snakeMap.grid
       .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
       .join('\n');
-    // console.log(drawGrid);
-    // console.log();
+    console.log(drawGrid);
+    console.log();
     return {
       snake,
       snakeMap,
@@ -92,6 +98,7 @@ export function getTickStream(
   unsubscribe$: Observable<boolean>,
 ) {
   const tick$ = interval$.pipe(
+    observeOn(animationFrameScheduler),
     withLatestFrom(direction$),
     takeUntil(unsubscribe$),
   );
@@ -101,6 +108,7 @@ export function getTickStream(
 export function getIntervalStream(range$: Observable<number>) {
   const interval$ = range$.pipe(
     switchMap(range => interval(100).pipe(filter(x => x % range === 0))),
+    share(),
   );
   return interval$;
 }
@@ -115,7 +123,6 @@ export function getDirectionStream(interval$: Observable<number>) {
     concatMap(input =>
       interval$.pipe(
         map(_ => input),
-        tap(_ => console.log('from tap: ', _, input)),
         take(1),
       ),
     ),
