@@ -1,11 +1,11 @@
 import { MAP_HEIGHT, MAP_WIDTH } from './constants';
-import {
-  Food,
-  Snake,
-  SnakeMap,
-  SnakeState,
-  Tile
-  } from './models';
+import { Food, Snake, SnakeMap, SnakeState, Tile } from './models';
+
+export const SNAKE_HEAD_TILE = {
+  isFood: false,
+  isSnake: true,
+  isSnakeHead: true,
+};
 
 export function defaultSnakeMap(): SnakeMap {
   const grid = emptyGrid();
@@ -21,13 +21,16 @@ export function updateSnakeMap(
   food: Food,
 ): SnakeMap {
   const grid = emptyGrid();
-  grid[food.i][food.j] = { isFood: true, isSnake: false };
+  grid[food.i][food.j] = { isFood: true, isSnake: false, isSnakeHead: false };
   snake.parts.forEach(part => {
     grid[part.i][part.j] = {
       isFood: false,
       isSnake: true,
+      isSnakeHead: false,
     };
   });
+
+  grid[snake.head.i][snake.head.j] = SNAKE_HEAD_TILE;
 
   return {
     ...snakeMap,
@@ -42,7 +45,7 @@ function emptyTile(snakeMap: SnakeMap, i: number, j: number) {
 
 function emptyGrid(): Tile[][] {
   return initGrid((i, j) => {
-    return { isFood: false, isSnake: false };
+    return { isFood: false, isSnake: false, isSnakeHead: false };
   });
 }
 

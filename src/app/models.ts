@@ -19,6 +19,10 @@ export enum Direction {
   West = 3,
 }
 
+export function defaultFood(): Food {
+  return { i: 0, j: 10 };
+}
+
 export interface Food {
   i: number;
   j: number;
@@ -31,6 +35,7 @@ export interface SnakeMap {
 export interface Tile {
   isFood: boolean;
   isSnake: boolean;
+  isSnakeHead: boolean;
 }
 
 export interface SnakeState {

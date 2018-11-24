@@ -19,7 +19,7 @@ import {
   distinctUntilChanged,
 } from 'rxjs/operators';
 import { getInputStream } from './input';
-import { Direction, SnakeState } from './models';
+import { Direction, SnakeState, defaultFood } from './models';
 import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
   defaultSnake,
@@ -65,7 +65,7 @@ export function getSnakeStateStream(
 ) {
   let state: SnakeState = {
     snake: defaultSnake(),
-    food: { j: 5, i: 0 },
+    food: defaultFood(),
     snakeMap: defaultSnakeMap(),
   };
 
