@@ -1,8 +1,9 @@
 <ng-container *ngFor="let row of grid; index as rowIndex">
   <div
-    class="tile"
-    [ngClass]="getTileClass(tile)"
-    [ngStyle]="{ 'grid-row': rowIndex + 1 }"
+    class="tile-container"
     *ngFor="let tile of row"
-  ></div>
+    [ngStyle]="{ 'grid-row': rowIndex + 1 }"
+  >
+    <div class="tile" [ngClass]="getTileClass(tile)"></div>
+  </div>
 </ng-container>
