@@ -1,15 +1,12 @@
 import { Direction, Food, Snake, SnakePart } from './models';
 
 export function defaultSnake(): Snake {
-  const head = {
-    i: 0,
-    j: 0,
-  };
+  const parts = [{ i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }];
   return {
     direction: Direction.East,
-    head,
-    length: 1,
-    parts: [head],
+    head: parts[parts.length - 1],
+    length: parts.length,
+    parts,
     foodEaten: false,
   };
 }
