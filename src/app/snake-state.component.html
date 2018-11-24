@@ -1,3 +1,8 @@
-<p>snake state works!</p>
-
-<p>{{ state?.snake | json }}</p>
+<ng-container *ngFor="let row of grid; index as rowIndex">
+  <div
+    class="tile"
+    [ngClass]="getTileClass(tile)"
+    [ngStyle]="{ 'grid-row': rowIndex + 1 }"
+    *ngFor="let tile of row"
+  ></div>
+</ng-container>

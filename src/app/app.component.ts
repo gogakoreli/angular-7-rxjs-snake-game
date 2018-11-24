@@ -94,8 +94,8 @@ export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
   const drawGrid = snakeMap.grid
     .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
     .join('\n');
-  console.log(drawGrid);
-  console.log();
+  // console.log(drawGrid);
+  // console.log();
   return {
     snake,
     snakeMap,

@@ -1,0 +1,17 @@
+:host {
+  display: grid;
+  background: black;
+  grid-gap: 1px 1px;
+}
+
+.tile {
+  width: 20px;
+  height: 20px;
+  background: white;
+  &.snake {
+    background: green;
+  }
+  &.food {
+    background: red;
+  }
+}
