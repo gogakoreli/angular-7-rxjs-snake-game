@@ -8,4 +8,9 @@
   (input)="sliderRangeChange($event?.target?.value)"
 />
 
-<app-snake-state [state]="snakeState$ | async"></app-snake-state>
+<ng-container *ngIf="(snakeState$ | async) as state; else: elseTemplate">
+  <h2>Score : {{ state.snake.length }}</h2>
+
+  <app-snake-state [state]="state"></app-snake-state>
+</ng-container>
+<ng-template #elseTemplate> <h2>Press Any Key</h2> </ng-template>
