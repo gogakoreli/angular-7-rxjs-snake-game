@@ -18,7 +18,7 @@ import {
   observeOn,
   distinctUntilChanged,
 } from 'rxjs/operators';
-import { getInputStream } from './input';
+import { getInputStream, InputKey } from './input';
 import { Direction, SnakeState, defaultFood } from './models';
 import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
@@ -69,9 +69,10 @@ export function getSnakeStateStream(
     snakeMap: defaultSnakeMap(),
   };
 
+  const input$ = getInputStream();
   const range$ = getRangeStream(sliderRange$);
   const interval$ = getIntervalStream(range$);
-  const direction$ = getDirectionStream(interval$);
+  const direction$ = getDirectionStream(input$, interval$);
   const tick$ = getTickStream(interval$, direction$, unsubscribe$);
 
   const state$ = tick$.pipe(
@@ -91,9 +92,9 @@ export function getSnakeStateStream(
 
 export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
   snakeMap = updateSnakeMap(snakeMap, snake, food);
-  const drawGrid = snakeMap.grid
-    .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
-    .join('\n');
+  // const drawGrid = snakeMap.grid
+  //   .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
+  //   .join('\n');
   // console.log(drawGrid);
   // console.log();
   return {
@@ -124,9 +125,10 @@ export function getIntervalStream(range$: Observable<number>) {
   return interval$;
 }
 
-export function getDirectionStream(interval$: Observable<number>) {
-  const input$ = getInputStream();
-
+export function getDirectionStream(
+  input$: Observable<InputKey>,
+  interval$: Observable<number>,
+) {
   const direction$ = input$.pipe(
     map(key => Direction[Direction[key]] as Direction),
     distinctUntilChanged(),
