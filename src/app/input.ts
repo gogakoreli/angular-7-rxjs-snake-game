@@ -11,6 +11,8 @@ const A_KEY_CODE = 65;
 const S_KEY_CODE = 83;
 const D_KEY_CODE = 68;
 
+const SPACE_KEY_CODE = 32;
+
 function isUpPressed(keyCode: number) {
   return keyCode === W_KEY_CODE || keyCode === UP_ARR_KEY_CODE;
 }
@@ -27,6 +29,10 @@ function isLeftPressed(keyCode: number) {
   return keyCode === A_KEY_CODE || keyCode === LEFT_ARR_KEY_CODE;
 }
 
+function isPausePressed(keyCode: number) {
+  return keyCode === SPACE_KEY_CODE;
+}
+
 function getInputKey(keyCode: number): InputKey {
   let result = InputKey.None;
   if (isUpPressed(keyCode)) {
@@ -37,8 +43,10 @@ function getInputKey(keyCode: number): InputKey {
     result = InputKey.Down;
   } else if (isLeftPressed(keyCode)) {
     result = InputKey.Left;
+  } else if (isPausePressed(keyCode)) {
+    result = InputKey.Pause;
   }
-  return result; 
+  return result;
 }
 
 export function getInputStream(): Observable<InputKey> {
@@ -53,4 +61,5 @@ export enum InputKey {
   Right = 1,
   Down = 2,
   Left = 3,
+  Pause = 4,
 }
