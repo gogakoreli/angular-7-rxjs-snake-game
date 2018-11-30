@@ -1,5 +1,19 @@
-import { fromEvent, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {
+  fromEvent,
+  Observable,
+  pairs,
+  Subscriber,
+  BehaviorSubject,
+} from 'rxjs';
+import {
+  map,
+  filter,
+  zip,
+  pairwise,
+  tap,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
 
 const UP_ARR_KEY_CODE = 38;
 const RIGHT_ARR_KEY_CODE = 39;
@@ -53,6 +67,31 @@ export function getInputStream(): Observable<InputKey> {
   return fromEvent(document, 'keydown').pipe(
     map((event: KeyboardEvent) => getInputKey(event && event.keyCode)),
   );
+}
+
+export function getPauseStream(
+  input$: Observable<InputKey>,
+): Observable<boolean> {
+  // const pause$ = new Observable<boolean>(observer => {
+  //   let paused: boolean = true;
+
+  //   const subscription = pausePress$.subscribe(_ => {
+  //     paused = !paused;
+  //     observer.next(paused);
+  //   });
+  //   return () => {
+  //     subscription.unsubscribe();
+  //   };
+  // });
+
+  input$.pipe(
+    map(inputKey => inputKey === InputKey.Pause),
+    filter(x => x),
+  );
+
+  const pause$ = new BehaviorSubject<boolean>(false);
+
+  return pause$;
 }
 
 export enum InputKey {
