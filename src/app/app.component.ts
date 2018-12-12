@@ -1,4 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { getInputStream, InputKey } from './input';
+import { defaultFood, Direction, SnakeState } from './models';
+import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
   BehaviorSubject,
   interval,
@@ -18,9 +21,6 @@ import {
   observeOn,
   distinctUntilChanged,
 } from 'rxjs/operators';
-import { getInputStream, InputKey } from './input';
-import { Direction, SnakeState, defaultFood } from './models';
-import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
   defaultSnake,
   moveToDirection,
@@ -54,7 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public sliderRangeChange(value: string) {
-    const sliderRange = Number.parseInt(value);
+    const sliderRange = Number.parseInt(value, 10);
     this.sliderRange$.next(sliderRange);
   }
 }
@@ -132,7 +132,7 @@ export function getDirectionStream(
   const direction$ = input$.pipe(
     map(key => Direction[Direction[key]] as Direction),
     distinctUntilChanged(),
-    filter(dir => dir !== Direction.None),
+    filter(dir => dir >= 0 && dir <= 3),
 
     concatMap(input =>
       interval$.pipe(
