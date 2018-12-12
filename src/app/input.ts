@@ -1,18 +1,11 @@
+import { BehaviorSubject, fromEvent, Observable } from 'rxjs';
 import {
-  fromEvent,
-  Observable,
-  pairs,
-  Subscriber,
-  BehaviorSubject,
-} from 'rxjs';
-import {
-  map,
   filter,
-  zip,
-  pairwise,
-  tap,
-  startWith,
-  switchMap,
+  map,
+  merge,
+  mergeAll,
+  scan,
+  combineLatest,
 } from 'rxjs/operators';
 
 const UP_ARR_KEY_CODE = 38;
@@ -69,29 +62,32 @@ export function getInputStream(): Observable<InputKey> {
   );
 }
 
-export function getPauseStream(
-  input$: Observable<InputKey>,
-): Observable<boolean> {
-  // const pause$ = new Observable<boolean>(observer => {
-  //   let paused: boolean = true;
-
-  //   const subscription = pausePress$.subscribe(_ => {
-  //     paused = !paused;
-  //     observer.next(paused);
-  //   });
-  //   return () => {
-  //     subscription.unsubscribe();
-  //   };
-  // });
-
-  input$.pipe(
-    map(inputKey => inputKey === InputKey.Pause),
-    filter(x => x),
-  );
-
-  const pause$ = new BehaviorSubject<boolean>(false);
-
-  return pause$;
+export function pauser<T>(input$: Observable<InputKey>) {
+  return (source: Observable<T>) =>
+    new Observable<T>(subscriber =>
+      source
+        .pipe(
+          combineLatest(
+            input$.pipe(
+              map(inputKey => inputKey === InputKey.Pause),
+              filter(x => x),
+              scan(x => !x),
+            ),
+          ),
+          filter(([_, paused]) => !paused),
+        )
+        .subscribe({
+          next([value, _]) {
+            subscriber.next(value);
+          },
+          error(err) {
+            subscriber.error(err);
+          },
+          complete() {
+            subscriber.complete();
+          },
+        }),
+    );
 }
 
 export enum InputKey {

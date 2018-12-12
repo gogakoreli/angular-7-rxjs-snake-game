@@ -1,6 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { SnakeState, Tile } from './models';
-import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-snake-state',

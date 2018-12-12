@@ -1,5 +1,11 @@
 import { MAP_HEIGHT, MAP_WIDTH } from './constants';
-import { Food, Snake, SnakeMap, SnakeState, Tile } from './models';
+import {
+  Food,
+  Snake,
+  SnakeMap,
+  SnakeState,
+  Tile
+} from './models';
 
 export const SNAKE_HEAD_TILE = {
   isFood: false,
@@ -50,7 +56,7 @@ function emptyGrid(): Tile[][] {
 }
 
 function initGrid(setItem: (i: number, j: number) => Tile): Tile[][] {
-  let grid: Tile[][] = [];
+  const grid: Tile[][] = [];
   for (let i = 0; i < MAP_WIDTH; i++) {
     grid[i] = [];
     for (let j = 0; j < MAP_HEIGHT; j++) {
@@ -62,8 +68,8 @@ function initGrid(setItem: (i: number, j: number) => Tile): Tile[][] {
 
 export function randomFood(state: SnakeState): SnakeState {
   while (true) {
-    let i = Math.floor(Math.random() * MAP_WIDTH);
-    let j = Math.floor(Math.random() * MAP_HEIGHT);
+    const i = Math.floor(Math.random() * MAP_WIDTH);
+    const j = Math.floor(Math.random() * MAP_HEIGHT);
 
     if (emptyTile(state.snakeMap, i, j)) {
       state = {
