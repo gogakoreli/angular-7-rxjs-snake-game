@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { getInputStream, InputKey } from './input';
+import { getInputStream, InputKey, pauser } from './input';
 import { defaultFood, Direction, SnakeState } from './models';
 import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
@@ -73,7 +73,7 @@ export function getSnakeStateStream(
   const range$ = getRangeStream(sliderRange$);
   const interval$ = getIntervalStream(range$);
   const direction$ = getDirectionStream(input$, interval$);
-  const tick$ = getTickStream(interval$, direction$, unsubscribe$);
+  const tick$ = getTickStream(input$, interval$, direction$, unsubscribe$);
 
   const state$ = tick$.pipe(
     map(([_, direction]) => {
@@ -105,11 +105,13 @@ export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
 }
 
 export function getTickStream(
+  input$: Observable<InputKey>,
   interval$: Observable<number>,
   direction$: Observable<Direction>,
   unsubscribe$: Observable<boolean>,
 ) {
   const tick$ = interval$.pipe(
+    pauser(input$),
     observeOn(animationFrameScheduler),
     withLatestFrom(direction$),
     takeUntil(unsubscribe$),
