@@ -1,4 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { getInputStream, InputKey, pauser } from './input';
+import { defaultFood, Direction, SnakeState } from './models';
+import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
   BehaviorSubject,
   interval,
@@ -18,9 +21,6 @@ import {
   observeOn,
   distinctUntilChanged,
 } from 'rxjs/operators';
-import { getInputStream, InputKey } from './input';
-import { Direction, SnakeState, defaultFood } from './models';
-import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
   defaultSnake,
   moveToDirection,
@@ -54,7 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public sliderRangeChange(value: string) {
-    const sliderRange = Number.parseInt(value);
+    const sliderRange = Number.parseInt(value, 10);
     this.sliderRange$.next(sliderRange);
   }
 }
@@ -73,7 +73,7 @@ export function getSnakeStateStream(
   const range$ = getRangeStream(sliderRange$);
   const interval$ = getIntervalStream(range$);
   const direction$ = getDirectionStream(input$, interval$);
-  const tick$ = getTickStream(interval$, direction$, unsubscribe$);
+  const tick$ = getTickStream(input$, interval$, direction$, unsubscribe$);
 
   const state$ = tick$.pipe(
     map(([_, direction]) => {
@@ -105,11 +105,13 @@ export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
 }
 
 export function getTickStream(
+  input$: Observable<InputKey>,
   interval$: Observable<number>,
   direction$: Observable<Direction>,
   unsubscribe$: Observable<boolean>,
 ) {
   const tick$ = interval$.pipe(
+    pauser(input$),
     observeOn(animationFrameScheduler),
     withLatestFrom(direction$),
     takeUntil(unsubscribe$),
@@ -132,7 +134,7 @@ export function getDirectionStream(
   const direction$ = input$.pipe(
     map(key => Direction[Direction[key]] as Direction),
     distinctUntilChanged(),
-    filter(dir => dir !== Direction.None),
+    filter(dir => dir >= 0 && dir <= 3),
 
     concatMap(input =>
       interval$.pipe(
