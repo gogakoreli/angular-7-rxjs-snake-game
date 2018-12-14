@@ -4,5 +4,6 @@ services:
   snake:
     container_name: snake
     build: .
+    image: gk/snake
     ports:
       - '80:80'
