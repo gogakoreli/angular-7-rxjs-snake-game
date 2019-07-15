@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { getInputStream, InputKey } from './input';
+import { getInputStream, InputKey, getPauseStream } from './input';
 import { defaultFood, Direction, SnakeState } from './models';
 import { defaultSnakeMap, randomFood, updateSnakeMap } from './snake-map';
 import {
@@ -69,13 +69,15 @@ export function getSnakeStateStream(
     snake: defaultSnake(),
     food: defaultFood(),
     snakeMap: defaultSnakeMap(),
+    paused: true,
   };
 
   const input$ = getInputStream();
   const range$ = getRangeStream(sliderRange$);
   const interval$ = getIntervalStream(range$);
   const direction$ = getDirectionStream(input$, interval$);
-  const pausableInterval$ = getPausableInterval(interval$, input$);
+  const pause$ = getPauseStream(input$);
+  const pausableInterval$ = getPausableIntervalStream(interval$, pause$);
   const tick$ = getTickStream(pausableInterval$, direction$, unsubscribe$);
 
   const state$ = tick$.pipe(
@@ -85,15 +87,22 @@ export function getSnakeStateStream(
       state = { ...state, snake: snakeFoodEaten(state.snake, state.food) };
       state = checkFoodEaten(state);
 
-      state = onTick(state);
       return state;
     }),
+    switchMap((state) => pause$.pipe(map((paused) => ({ ...state, paused })))),
+    startWith(state),
+    map(onTick),
   );
 
   return state$;
 }
 
-export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
+export function onTick({
+  snake,
+  food,
+  snakeMap,
+  paused,
+}: SnakeState): SnakeState {
   snakeMap = updateSnakeMap(snakeMap, snake, food);
   // const drawGrid = snakeMap.grid
   //   .map(x => x.map(y => (y.isSnake ? 'x' : y.isFood ? '*' : '.')).join(' '))
@@ -104,27 +113,16 @@ export function onTick({ snake, food, snakeMap }: SnakeState): SnakeState {
     snake,
     snakeMap,
     food,
+    paused,
   };
 }
 
-export function getPausableInterval(
-  interval$: Observable<number>,
-  input$: Observable<InputKey>,
-) {
-  let pause = true;
-  return input$.pipe(
-    filter((x) => x === InputKey.Pause),
-    map((_) => (pause = !pause)),
-    switchMap((pause) => (pause ? never() : interval$)),
-  );
-}
-
 export function getTickStream(
-  interval$: Observable<number>,
+  pausableInterval$: Observable<number>,
   direction$: Observable<Direction>,
   unsubscribe$: Observable<boolean>,
 ) {
-  const tick$ = interval$.pipe(
+  const tick$ = pausableInterval$.pipe(
     observeOn(animationFrameScheduler),
     withLatestFrom(direction$),
     map(([_, dir]) => dir),
@@ -159,6 +157,13 @@ export function getDirectionStream(
     startWith(Direction.None),
   );
   return direction$;
+}
+
+export function getPausableIntervalStream(
+  interval$: Observable<number>,
+  pause$: Observable<boolean>,
+): Observable<number> {
+  return pause$.pipe(switchMap((pause) => (pause ? never() : interval$)));
 }
 
 export function getRangeStream(sliderRange$: Observable<number>) {

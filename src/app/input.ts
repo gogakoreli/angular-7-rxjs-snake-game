@@ -1,12 +1,5 @@
-import { BehaviorSubject, fromEvent, Observable } from 'rxjs';
-import {
-  filter,
-  map,
-  merge,
-  mergeAll,
-  scan,
-  combineLatest,
-} from 'rxjs/operators';
+import { fromEvent, Observable } from 'rxjs';
+import { filter, map, shareReplay } from 'rxjs/operators';
 
 const UP_ARR_KEY_CODE = 38;
 const RIGHT_ARR_KEY_CODE = 39;
@@ -59,6 +52,17 @@ function getInputKey(keyCode: number): InputKey {
 export function getInputStream(): Observable<InputKey> {
   return fromEvent(document, 'keydown').pipe(
     map((event: KeyboardEvent) => getInputKey(event && event.keyCode)),
+  );
+}
+
+export function getPauseStream(
+  input$: Observable<InputKey>,
+): Observable<boolean> {
+  let pause = true;
+  return input$.pipe(
+    filter((x) => x === InputKey.Pause),
+    map((_) => (pause = !pause)),
+    shareReplay(1),
   );
 }
 

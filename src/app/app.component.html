@@ -1,16 +1,16 @@
-<input
-  type="range"
+<input type="range"
   step="25"
   min="0"
   max="100"
   value="50"
   class="slider"
-  (input)="sliderRangeChange($event?.target?.value)"
-/>
+  (input)="sliderRangeChange($event?.target?.value)" />
 
-<ng-container *ngIf="(snakeState$ | async) as state; else: elseTemplate">
+<ng-container *ngIf="(snakeState$ | async) as state">
   <h2>Score : {{ state.snake.length }}</h2>
 
+
   <app-snake-state [state]="state"></app-snake-state>
+
+  <h2 *ngIf="state.paused">Press Space bar to Pause/Unpause</h2>
 </ng-container>
-<ng-template #elseTemplate> <h2>Press Space bar to Pause/Unpause</h2> </ng-template>

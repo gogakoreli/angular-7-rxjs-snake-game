@@ -42,4 +42,5 @@ export interface SnakeState {
   snake: Snake;
   snakeMap: SnakeMap;
   food: Food;
+  paused: boolean;
 }
