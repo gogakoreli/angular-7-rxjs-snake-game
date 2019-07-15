@@ -62,34 +62,6 @@ export function getInputStream(): Observable<InputKey> {
   );
 }
 
-export function pauser<T>(input$: Observable<InputKey>) {
-  return (source: Observable<T>) =>
-    new Observable<T>(subscriber =>
-      source
-        .pipe(
-          combineLatest(
-            input$.pipe(
-              map(inputKey => inputKey === InputKey.Pause),
-              filter(x => x),
-              scan(x => !x),
-            ),
-          ),
-          filter(([_, paused]) => !paused),
-        )
-        .subscribe({
-          next([value, _]) {
-            subscriber.next(value);
-          },
-          error(err) {
-            subscriber.error(err);
-          },
-          complete() {
-            subscriber.complete();
-          },
-        }),
-    );
-}
-
 export enum InputKey {
   None = -1,
   Up = 0,
