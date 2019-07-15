@@ -21,6 +21,7 @@ import {
   share,
   observeOn,
   distinctUntilChanged,
+  startWith,
 } from 'rxjs/operators';
 import {
   defaultSnake,
@@ -78,7 +79,7 @@ export function getSnakeStateStream(
   const tick$ = getTickStream(pausableInterval$, direction$, unsubscribe$);
 
   const state$ = tick$.pipe(
-    map(([_, direction]) => {
+    map((direction) => {
       state = { ...state, snake: updateDirection(state.snake, direction) };
       state = { ...state, snake: moveToDirection(state.snake, state.food) };
       state = { ...state, snake: snakeFoodEaten(state.snake, state.food) };
@@ -126,6 +127,7 @@ export function getTickStream(
   const tick$ = interval$.pipe(
     observeOn(animationFrameScheduler),
     withLatestFrom(direction$),
+    map(([_, dir]) => dir),
     takeUntil(unsubscribe$),
   );
   return tick$;
@@ -154,6 +156,7 @@ export function getDirectionStream(
         take(1),
       ),
     ),
+    startWith(Direction.None),
   );
   return direction$;
 }
