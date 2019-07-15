@@ -13,6 +13,8 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 ## The Game
 
+🎮 Play demo game at https://gogakoreli.github.io/angular-7-rxjs-snake-game/
+
 ![Alt text](/snake-game-snapshot.png?raw=true 'Snake Game Snapshot')
 
 by Goga Koreli

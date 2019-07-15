@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --prod",
+    "build-github": "ng build --prod --base-href \"https://gogakoreli.github.io/angular-7-rxjs-snake-game\"",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
